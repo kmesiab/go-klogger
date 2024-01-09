@@ -1,0 +1,51 @@
+run:
+  tests: true # Lint everything
+  skip-dirs: [] # Lint everything
+  skip-files: [] # Lint everything
+  go: 1.21.1
+
+issues:
+  exclude-use-default: false # Do not use default excludes
+
+disable-all: true # Disable all linters, then enable only ones we want.
+linters:
+  enable:
+    - asasalint       # Check for pass []any as any in variadic func(...any).
+    - asciicheck      # Simple linter to check that your code does not contain non-ASCII identifiers.
+    - bodyclose       # Checks whether HTTP response body is closed successfully
+    - containedctx    # Containedctx is a linter that detects struct contained context.Context field.
+    - contextcheck    # Check whether the function uses a non-inherited context.
+    - cyclop          # Checks function and package cyclomatic complexity.
+    #    - decorder       # Don't use this because we cannot disable for tests, and then you must have fixtures above other things
+    - dogsled         # Checks assignments with too many blank identifiers (e.g. x, , , _, := f()).
+    - errcheck        # Check for unchecked errors
+    - exportloopref   # Checks for pointers to enclosing loop variables
+    - forcetypeassert # Finds forced type assertions
+    - goconst         # Finds repeated strings that could be replaced by a constant
+    - gocritic        # The most opinionated Go source code linter for code audit
+    - gosec           # Security-related linters
+    - gosimple        # Linter for Go source code that specializes in simplifying code
+    - govet           # Vet examines Go source code to report suspicious constructs
+    - ineffassign     # Detects when assignments to existing variables are not used
+    - misspell        # Correct commonly misspelled English words
+    - noctx           # Checks that http.Request.WithContext is used with incoming requests
+    - nolintlint      # Reports ill-formed or insufficient nolint directives
+    - prealloc        # Finds slice declarations that could potentially be preallocated
+    - prealloc        # Finds slice declarations that could potentially be preallocated
+    - predeclared     # Finds code that shadows one of Go's predeclared identifiers
+    - reassign        # Finds slice reassignment
+    - sqlclosecheck   # Checks that sql.Rows and sql.Stmt are closed
+    - staticcheck     # A collection of modern Go linters
+    - stylecheck      # Stylecheck is a replacement for golint
+    - unused          # Checks Go code for unused constants, variables, functions and types
+    - varnamelen      # Checks that variable and function name lengths are consistent
+    - wastedassign    # Finds wasted assignment statements
+
+linters-settings:
+  dogsled:
+    max-blank-identifiers: 1
+  errcheck:
+    check-type-assertions: true # Report about not checking of errors in type assertions: `a := b.(MyStruct)`.
+    check-blank: true # Report about assignment of errors to blank identifier: `num, _ := strconv.Atoi(numStr)`.
+  gofmt:
+    simplify: true # Have gofmt simplify code for us
