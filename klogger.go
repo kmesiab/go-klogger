@@ -1,3 +1,27 @@
+/*
+MIT License
+
+Copyright (c) 2024 Kevin Mesiab
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package go_klogger
 
 import (
@@ -10,16 +34,21 @@ import (
 const DefaultLogLevel = logrus.DebugLevel
 
 var (
-	once          sync.Once
-	globalLogger  *logrus.Logger
+	// Synchronize the creation of the global logger
+	once sync.Once
+
+	// The global logger used by all KLoggers
+	globalLogger *logrus.Logger
+
+	// Default key/value pairs to add to every log message
 	defaultFields map[string]interface{}
 )
 
 type KLogger struct {
 	Logger   *logrus.Logger
-	Message  string                 `json:"message"`
-	LogLevel logrus.Level           `json:"log_level"`
-	Data     map[string]interface{} `json:"data"`
+	Message  string                 `json:"message"`   // A reference to the global logger
+	LogLevel logrus.Level           `json:"log_level"` // The desired log level
+	Data     map[string]interface{} `json:"data"`      // Key value pairs to include in the log output
 }
 
 // InitializeGlobalLogger Optionally allows you to specify the logger level and formatter
@@ -65,7 +94,7 @@ func Logf(format string, a ...interface{}) *KLogger {
 	return k.AddData(defaultFields)
 }
 
-// SetLogLevel sets the log level of the logger.
+// SetLogLevel sets the log level of the logger
 func (l *KLogger) SetLogLevel(level logrus.Level) *KLogger {
 	l.LogLevel = level
 	l.Logger.SetLevel(level)
@@ -76,6 +105,14 @@ func (l *KLogger) SetLogLevel(level logrus.Level) *KLogger {
 // Add adds a key-value pair to the logger's data.
 func (l *KLogger) Add(key string, value interface{}) *KLogger {
 	l.Data[key] = value
+
+	return l
+}
+
+func (l *KLogger) AddData(data map[string]interface{}) *KLogger {
+	for k, v := range data {
+		l.Data[k] = v
+	}
 
 	return l
 }
@@ -123,14 +160,6 @@ func (l *KLogger) Fatal() *KLogger {
 func (l *KLogger) Panic() *KLogger {
 	if l.LogLevel <= logrus.PanicLevel {
 		l.Logger.WithFields(l.Data).Panic(l.Message)
-	}
-
-	return l
-}
-
-func (l *KLogger) AddData(data map[string]interface{}) *KLogger {
-	for k, v := range data {
-		l.Data[k] = v
 	}
 
 	return l
