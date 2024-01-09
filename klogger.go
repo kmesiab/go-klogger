@@ -1,28 +1,16 @@
-/*
-MIT License
-
-Copyright (c) 2024 Kevin Mesiab
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-
-package go_klogger
+// Package goklogger provides an enhanced logging experience by wrapping the
+// popular logrus package.
+//
+// This package offers a more structured and flexible
+// approach to logging, allowing developers to easily integrate and customize
+// logging functionality in their Go applications.
+// Key features include the
+// ability to set global log levels, add default fields to all log messages,
+// and create log messages with various severity levels.
+// The package is designed
+// to be intuitive and easy to use, while providing powerful capabilities for
+// detailed and informative logging.
+package goklogger
 
 import (
 	"fmt"
@@ -78,7 +66,7 @@ func SetDefaultFields(fields map[string]interface{}) {
 }
 
 // Logf creates a new logger with the given format and arguments.
-func Logf(format string, a ...interface{}) *KLogger {
+func Logf(format string, vars ...interface{}) *KLogger {
 
 	// Set up a global logger with default preferences.  This is
 	// only ever done once, whether here or by calling InitializeGlobalLogger
@@ -86,13 +74,13 @@ func Logf(format string, a ...interface{}) *KLogger {
 	InitializeGlobalLogger(DefaultLogLevel, &logrus.JSONFormatter{})
 
 	// Pass back an instance of a KLogger with the global logger and default properties.
-	k := &KLogger{
+	newLogger := &KLogger{
 		Logger:  globalLogger,
-		Message: fmt.Sprintf(format, a...),
+		Message: fmt.Sprintf(format, vars...),
 		Data:    make(map[string]interface{}),
 	}
 
-	return k.AddData(defaultFields)
+	return newLogger.AddData(defaultFields)
 }
 
 // SetLogLevel sets the log level of the logger
