@@ -26,6 +26,7 @@ package go_klogger
 
 import (
 	"fmt"
+	"runtime/debug"
 	"sync"
 
 	"github.com/sirupsen/logrus"
@@ -109,10 +110,21 @@ func (l *KLogger) Add(key string, value interface{}) *KLogger {
 	return l
 }
 
+// AddData adds a key-value pair to the logger's data.
 func (l *KLogger) AddData(data map[string]interface{}) *KLogger {
 	for k, v := range data {
 		l.Data[k] = v
 	}
+
+	return l
+}
+
+// AddError unpacks the trace of an error and adds it to the logger's data.
+func (l *KLogger) AddError(err error) *KLogger {
+	trace := debug.Stack()
+
+	l.Data["error"] = err.Error()
+	l.Data["stack"] = fmt.Sprintf("%+v", trace)
 
 	return l
 }
