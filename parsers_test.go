@@ -7,7 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func TestParseLogLevel(t *testing.T) {
+func TestStringToLogrusLevel(t *testing.T) {
 	tests := []struct {
 		name          string
 		level         string
@@ -35,9 +35,44 @@ func TestParseLogLevel(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			actualLevel := ParseLogLevel(tt.level)
+			actualLevel := StringToLogrusLevel(tt.level)
 			if actualLevel != tt.expectedLevel {
 				t.Errorf("ParseLogLevel(%s) = %v, want %v", strings.TrimSpace(tt.level), actualLevel, tt.expectedLevel)
+			}
+		})
+	}
+}
+
+func TestStringToLogLevel(t *testing.T) {
+	tests := []struct {
+		name          string
+		input         string
+		expectedLevel LogLevel
+	}{
+		{"Trace level", "trace", TraceLevel},
+		{"Debug level", "debug", DebugLevel},
+		{"Info level", "info", InfoLevel},
+		{"Warn level", "warn", WarnLevel},
+		{"Warning level", "warning", WarnLevel}, // Test equivalent to "warn"
+		{"Error level", "error", ErrorLevel},
+		{"Fatal level", "fatal", FatalLevel},
+		{"Panic level", "panic", PanicLevel},
+		{"Default to Info level", "unknown", InfoLevel},
+		{"Case insensitivity", "DeBuG", DebugLevel},
+		{"Leading/trailing spaces", "  info  ", InfoLevel},
+		// Negative tests
+		{"Numeric level", "123", InfoLevel},
+		{"Special characters", "@#&*", InfoLevel},
+		{"Empty string", "", InfoLevel},
+		{"Whitespace only", "   ", InfoLevel},
+		{"Mixed characters", "info123", InfoLevel},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actualLevel := StringToLogLevel(tt.input)
+			if actualLevel != tt.expectedLevel {
+				t.Errorf("ParseLogLevel(%q) = %v, want %v", strings.TrimSpace(tt.input), actualLevel, tt.expectedLevel)
 			}
 		})
 	}
