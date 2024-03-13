@@ -15,6 +15,7 @@ package goklogger
 import (
 	"fmt"
 	"runtime/debug"
+	"strings"
 	"sync"
 
 	"github.com/sirupsen/logrus"
@@ -163,4 +164,62 @@ func (l *KLogger) Panic() *KLogger {
 	}
 
 	return l
+}
+
+// ParseLogLevel takes a string representation of a log level (e.g., "info", "debug") and returns
+// the corresponding logrus.Level. It is designed to be flexible, accepting any case and trimming
+// unnecessary whitespace from the input. This function supports all standard logrus levels:
+// "trace", "debug", "info", "warn"/"warning", "error", "fatal", and "panic". If the input does not
+// match any of these levels, it defaults to logrus.InfoLevel.
+//
+// Parameters:
+//   - level: A string representing the desired log level. This parameter is case-insensitive and
+//     spaces before and after the level name are ignored.
+//
+// Returns:
+//   - A logrus.Level corresponding to the input string. If the input is unrecognized, the function
+//     defaults to returning logrus.InfoLevel.
+//
+// Usage:
+// This function is particularly useful for parsing log level configurations from environment
+// variables or configuration files where the input may vary in case or include additional spaces.
+// It ensures that the application can dynamically adjust logging verbosity based on runtime
+// configurations.
+//
+// Example:
+// logLevel := ParseLogLevel("  DeBug ")
+// log.SetLevel(logLevel)
+//
+// Note:
+// The function treats "warn" and "warning" as equivalent, mapping both to logrus.WarnLevel,
+// aligning with logrus's own handling of these terms.
+func ParseLogLevel(level string) logrus.Level {
+	level = strings.ToLower(strings.TrimSpace(level))
+
+	switch level {
+	case "trace":
+		return logrus.TraceLevel
+
+	case "debug":
+		return logrus.DebugLevel
+
+	case "info":
+		return logrus.InfoLevel
+
+	case "warn", "warning": // logrus treats "warn" and "warning" as equivalent
+
+		return logrus.WarnLevel
+	case "error":
+
+		return logrus.ErrorLevel
+	case "fatal":
+
+		return logrus.FatalLevel
+	case "panic":
+
+		return logrus.PanicLevel
+	default:
+		// It's a common practice to default to InfoLevel when an unknown level is provided
+		return logrus.InfoLevel
+	}
 }
